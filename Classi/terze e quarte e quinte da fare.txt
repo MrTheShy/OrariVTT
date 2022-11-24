@@ -1,0 +1,69 @@
+function split_rows(tbl_param){
+        var tbl = $(tbl_param);
+        var tempTable = tbl.clone(true);
+    var tableBody = $(tempTable).children();
+    $(tableBody).children().each(function(index , item){
+        var currentRow = item;
+        $(currentRow).children().each(function(index1, item1){
+                var rows = $(item1).attr("rowspan");
+            if(rows>=2)
+            {
+                // copy the cell
+                var item2 = $(item1).clone(true);
+                // Remove rowspan
+                $(item1).removeAttr("rowspan");
+                $(item2).attr("rowspan",(rows)-1);
+                //console.log("item1:",$(item1).text(),", index:",index1);
+                // last item's index in next row
+                var indexOfLastElement = $(currentRow).next().children().last().index();
+                if(indexOfLastElement < index1)
+                {
+                     $(currentRow).next().append(item2)
+                }
+                else
+                {
+                    // intermediate cell insertion
+                    $(item2).insertBefore($(currentRow).next().children().eq(index1));
+                }
+            }
+        });
+        
+    });
+        return tempTable;
+}
+ function split_cols(tbl_param){
+        var tbl = $(tbl_param);
+        var tempTable = tbl.clone(true);
+    var tableBody = $(tempTable).children();
+    $(tableBody).children().each(function(index , item){
+        var currentRow = item;
+        for (var i=0; i<$(currentRow).children().length;i++){
+            var item1 = $(currentRow).children().eq(i);
+                var cols = $(item1).attr("colspan");
+                if(cols>=2)
+                {
+                    // copy the cell
+                    var item2 = $(item1).clone(true);
+                    
+                    // Remove rowspan
+                    $(item1).removeAttr("colspan");
+                    $(item2).attr("colspan", cols-1);
+                    // last item's index in next row
+                    $(item2).insertAfter(item1);
+                }
+            
+        }
+        
+    });
+        return tempTable;
+}
+function split_tbl(tbl_param){
+        var tbl = split_cols(tbl_param);
+        tbl = split_rows(tbl);
+        return tbl;
+}
+
+var table = document.getElementsByTagName("table")[0];
+
+const res1 = split_tbl(table);
+table.innerHTML= res1.html();
